@@ -314,6 +314,23 @@ namespace UseLibuv
 
 
         [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
+        internal static extern int uv_async_init(IntPtr loopHandle, IntPtr handle, uv_work_cb async_cb);
+
+        [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
+        internal static extern int uv_async_send(IntPtr handle);
+
+
+        [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
+        internal static extern int uv_timer_again(IntPtr handle);
+
+        [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
+        internal static extern void uv_timer_set_repeat(IntPtr handle, long repeat);
+
+        [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
+        internal static extern long uv_timer_get_repeat(IntPtr handle);
+
+
+        [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
         public static extern void uv_close(IntPtr handle, uv_close_cb close_cb);
 
 

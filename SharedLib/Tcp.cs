@@ -8,7 +8,6 @@ namespace UseLibuv
     {
         public Tcp(EventLoop loop) : base(loop)
         {
-            tcpCount++;
         }
 
         public Channel Channel{get;set;}

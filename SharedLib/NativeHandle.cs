@@ -9,7 +9,6 @@ namespace UseLibuv
     {
 
 
-        public static int tcpCount = 0;
 
         static readonly Libuv.uv_close_cb CloseCallback = OnCloseHandle;
         protected IntPtr _handle;
@@ -85,8 +84,7 @@ namespace UseLibuv
                 }
             }
 
-            tcpCount--;
-            Console.WriteLine($"free native handle. left:{tcpCount}");
+
             // Release memory
             Libuv.FreeMemory(handle);
             nativeHandle?.OnClosed();

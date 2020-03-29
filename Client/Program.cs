@@ -5,65 +5,172 @@ using SharedLib;
 using System.Threading;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using System.Threading.Tasks;
+using UseLibuv;
+using System.Collections.Concurrent;
 
 namespace Client
 {
+
+    public class Handler
+    {
+        public int GetNum(int count)
+        {
+            return count;
+        }
+
+        public Task<string> GetName()
+        {
+            var t = Task.Run<string>(() =>
+            {
+                Thread.Sleep(1000);
+
+                return "abcde";
+            });
+            return t;  
+        }
+
+        TaskCompletionSource<int> t = new TaskCompletionSource<int>();
+        public void Set(int i)
+        {
+            t.SetResult(i);
+        }
+        public void Cancel()
+        {
+           
+            //t.SetResult(i);
+            t.SetCanceled();
+                
+        }
+
+
+        public Task<int> GetAge()
+        {
+
+            //Task<int> tt = new Task<int>( ()=> { return 1; });
+
+
+            //return tt;
+
+            return t.Task;
+
+        }
+
+    }
+
+
+
+    public class Client
+    {
+
+        EventLoop _eventLoop;
+
+        ConcurrentQueue<Action> _jobs = new ConcurrentQueue<Action>();
+
+
+        Async _jobAsync;
+
+        public EventLoop Loop => _eventLoop;
+        public Client()
+        {
+            _eventLoop = new EventLoop();
+
+            _jobAsync = new Async(_eventLoop, doJob, null);
+
+
+        }
+
+        public void Start(long interval)
+        {
+            _eventLoop.Run(interval);
+
+        }
+
+        void doJob(object o)
+        {
+            Action job;
+            if(_jobs.TryDequeue(out job))
+            {
+                job();
+            }
+        }
+
+        public void AddAction()
+        {
+
+        }
+
+
+
+
+    }
+
+    public class Server
+    {
+        
+
+    }
+
+
+
     class Program
     {
 
         const string ipstr = "127.0.0.1";
         const int port = 11240;
 
-        static List<byte[]> _mems = new List<byte[]>();
 
-        static List<IntPtr> _ptrs = new List<IntPtr>();
-
-
-        static void Clear()
+        static async void Test(Handler h)
         {
-            return;
-            foreach(var ptr in _ptrs) {
-                Marshal.FreeCoTaskMem(ptr);
-            }
-            _ptrs.Clear();
 
-        }
-        static void TestGC()
-        {
-            var mem = new byte[1024*64];
-            //var gcHandle = GCHandle.Alloc(mem);
-            var ptr= Marshal.AllocCoTaskMem(1024 * 64);
+            var s= await h.GetName();
+            Console.WriteLine($"name is :{s}");
 
-            _mems.Add(mem);
-            //_ptrs.Add(ptr);
+            int i = await h.GetAge();
+            Console.WriteLine($"age is :{i}");
 
-            Marshal.FreeCoTaskMem(ptr);
-            if ( _mems.Count == 100)
-            {
-                _mems.Clear();
-                Clear();
-            }
 
 
         }
-        static void Main(string[] args)
+       static void Main(string[] args)
         {
-            int count = 0;
 
-            while (true)
+            Handler h = new Handler();
+            Test(h);
+            
+            Console.WriteLine($"Main Thread:{Thread.CurrentThread.ManagedThreadId}");
+
+            Thread.Sleep(1000);
+            h.Set(10);
+
+
+            //Thread.Sleep(3000);
+            Client c = new Client();
+
+            ThreadPool.QueueUserWorkItem((object obj) =>
             {
-                Thread.Sleep(100);
-                count++;
-                if (count < 100)
+                while (true)
                 {
-                    TestGC();
-                }else if(count == 100)
-                {
-                    _mems.Clear();
-                    Clear();
+                    Thread.Sleep(1500);
+
+                    Console.WriteLine($"another thread :{Thread.CurrentThread.ManagedThreadId}");
+
+
+                    c.Loop.AddAsyncJob(() =>
+                    {
+
+                        long dt = Libuv.uv_now(c.Loop.Loop);
+                        Console.WriteLine($"Job work in thread :{Thread.CurrentThread.ManagedThreadId}. at {dt}");
+
+                    });
                 }
-            }
-            //DispatcherTimer 
+
+            });
+            c.Start(1000);
+
+
+
+           //DispatcherTimer 
 
             /*
             Socket s = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);

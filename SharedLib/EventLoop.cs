@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Net;
 using System.Text;
@@ -74,12 +75,54 @@ namespace UseLibuv
         {
             _loop = Libuv.CreateLoop();
             Libuv.uv_loop_init(_loop);
+            _async = new Async(this, doAsyncJob, null);
+
+        }
+        ConcurrentQueue<Action> _asyncJobs= new ConcurrentQueue<Action>();
+
+        void doAsyncJob(object obj=null)
+        {
+            while(_asyncJobs.Count > 0)
+            {
+                Action job;
+
+                if (_asyncJobs.TryDequeue(out job))
+                {
+                    job();
+                }
+            }
+
+
+        }
+        void Update(long dt)
+        {
+            Console.WriteLine($"Upate {dt}");
 
         }
 
-        public void Run()
+        Timer _timer;
+        Async _async;
+        public void Run(long interval=0)
         {
+            if( interval>0)
+            {
+                _timer = new Timer(this, (obj) =>
+                {
+                    long dt = Libuv.uv_now(_loop);
+                    Update(dt);
+                },null);
+
+                _timer.Start(interval,interval);
+
+            }
+
             Libuv.uv_run(_loop, Libuv.uv_run_mode.UV_RUN_DEFAULT);
+        }
+        public void AddAsyncJob(Action action)
+        {
+            _asyncJobs.Enqueue(action);
+            _async.Send();
+
         }
 
 

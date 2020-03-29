@@ -9,6 +9,10 @@ namespace UseLibuv
     {
         EventLoop _eventLoop;
 
+
+        static readonly Libuv.uv_work_cb WorkCallback = OnWorkCallback;
+
+
         readonly Action<object> _callback;
         readonly object _state;
         public Async(EventLoop loop,Action<object> cb,object state)
@@ -23,7 +27,7 @@ namespace UseLibuv
             _state = state;
 
 
-            Libuv.uv_async_init(loop.Loop, _handle, OnWorkCallback);
+            Libuv.uv_async_init(loop.Loop, _handle, WorkCallback);
 
             GCHandle gcHandle = GCHandle.Alloc(this, GCHandleType.Normal);
             ((uv_handle_t*)_handle)->data = GCHandle.ToIntPtr(gcHandle);

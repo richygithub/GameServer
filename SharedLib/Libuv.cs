@@ -328,6 +328,17 @@ namespace UseLibuv
 
         [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
         internal static extern long uv_timer_get_repeat(IntPtr handle);
+        [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
+        internal static extern void uv_update_time(IntPtr handle);
+
+        [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
+        public static extern long uv_now(IntPtr handle);
+
+        [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
+        internal static extern long uv_hrtime(IntPtr handle);
+
+        [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
+        internal static extern int uv_backend_timeout(IntPtr handle);
 
 
         [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]

@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "UseLibuv": {
+      "commandName": "Project",
+      "nativeDebugging": true
+    }
+  }
+}

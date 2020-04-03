@@ -10,7 +10,7 @@ using System.Text;
 namespace UseLibuv
 {
 
-    enum uv_handle_type
+    public enum uv_handle_type
     {
         UV_UNKNOWN_HANDLE = 0,
         UV_ASYNC,
@@ -41,6 +41,15 @@ namespace UseLibuv
         public uv_handle_type type;
         public IntPtr close_cb;
     }
+
+
+    [StructLayout(LayoutKind.Sequential)]
+    struct uv_req_t
+    {
+        public IntPtr data;
+        public uv_req_type type;
+    }
+
 
     [StructLayout(LayoutKind.Sequential)]
     public struct uv_buf_t
@@ -207,6 +216,21 @@ namespace UseLibuv
     }
 
 
+    public enum uv_req_type
+    {
+        UV_UNKNOWN_REQ = 0,
+        UV_REQ,
+        UV_CONNECT,
+        UV_WRITE,
+        UV_SHUTDOWN,
+        UV_UDP_SEND,
+        UV_FS,
+        UV_WORK,
+        UV_GETADDRINFO,
+        UV_GETNAMEINFO,
+        UV_REQ_TYPE_PRIVATE,
+        UV_REQ_TYPE_MAX
+    }
 
     public unsafe static class Libuv
     {
@@ -216,28 +240,6 @@ namespace UseLibuv
             UV_RUN_ONCE,
             UV_RUN_NOWAIT
         };
-        public enum uv_handle_type
-        {
-            UV_UNKNOWN_HANDLE = 0,
-            UV_ASYNC,
-            UV_CHECK,
-            UV_FS_EVENT,
-            UV_FS_POLL,
-            UV_HANDLE,
-            UV_IDLE,
-            UV_NAMED_PIPE,
-            UV_POLL,
-            UV_PREPARE,
-            UV_PROCESS,
-            UV_STREAM,
-            UV_TCP,
-            UV_TIMER,
-            UV_TTY,
-            UV_UDP,
-            UV_SIGNAL,
-            UV_FILE,
-            UV_HANDLE_TYPE_MAX
-        }
 
         private const string LibraryName = "libuv";
 
@@ -260,7 +262,11 @@ namespace UseLibuv
 
 
 
+        [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
+        internal static extern int uv_write(IntPtr req, IntPtr handle, ref uv_buf_t bufs, int nbufs, uv_watcher_cb cb);
 
+        [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
+        internal static extern int uv_write2(IntPtr req, IntPtr handle, uv_buf_t[] bufs, int nbufs, IntPtr sendHandle, uv_watcher_cb cb);
 
 
         [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
@@ -286,6 +292,9 @@ namespace UseLibuv
         [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
         public static extern IntPtr uv_handle_size(uv_handle_type handleType);
 
+
+        [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
+        internal static extern IntPtr uv_req_size(uv_req_type reqType);
 
         [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
         public static extern int uv_listen(IntPtr handle, int backlog, uv_watcher_cb connection_cb);
@@ -350,6 +359,10 @@ namespace UseLibuv
 
 
         public static int GetSize(uv_handle_type handleType) => uv_handle_size(handleType).ToInt32();
+
+        public static int GetSize(uv_req_type reqType) => uv_req_size(reqType).ToInt32();
+
+
         public static IntPtr Allocate(uv_handle_type handleType)
         {
             int size = GetSize(handleType);
@@ -357,7 +370,11 @@ namespace UseLibuv
         }
 
         public static IntPtr Allocate(int size) => Marshal.AllocCoTaskMem(size);
-
+        public static IntPtr Allocate(uv_req_type requestType)
+        {
+            int size = GetSize(requestType);
+            return Allocate(size);
+        }
         public static void FreeMemory(IntPtr ptr) => Marshal.FreeCoTaskMem(ptr);
 
         public static IntPtr CreateLoop() => Allocate( uv_loop_size().ToInt32() );

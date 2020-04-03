@@ -10,7 +10,7 @@ namespace UseLibuv
         protected EventLoop _eventLoop;
         public TcpHandle(EventLoop loop) : base()
         {
-            _handle = Libuv.Allocate(Libuv.uv_handle_type.UV_TCP);
+            _handle = Libuv.Allocate(uv_handle_type.UV_TCP);
             _eventLoop = loop;
 
             Libuv.uv_tcp_init(loop.Loop, _handle);

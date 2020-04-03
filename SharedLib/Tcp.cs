@@ -15,13 +15,14 @@ namespace UseLibuv
         static public Libuv.uv_alloc_cb AllocCB = OnAllocCB;
         static public Libuv.uv_read_cb ReadCB = OnReadCB;
 
-        public delegate void ChannelRemoveHandler(Channel channel);
-        public event ChannelRemoveHandler ChannelRemoveEvent;
 
         void OnReadCB(IntPtr num)
         {
             //Channel.ReadCB( nread);
             int nread = (int)num;
+            Channel.ReadCB(nread);
+
+            /*
             if (nread < 0)
             {
                 //remove
@@ -31,8 +32,15 @@ namespace UseLibuv
             }
             else
             {
-                Channel.ReadCB(nread);
             }
+            */
+
+        }
+
+        void Send(byte[] buff)
+        {
+            //Libuv.uv_write()
+
 
         }
 

@@ -1,6 +1,8 @@
-﻿using System;
+﻿using Google.Protobuf;
+using System;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
+using Tutorial;
 
 namespace UseLibuv
 {
@@ -47,6 +49,28 @@ namespace UseLibuv
             //AreaServer as
 
             Console.WriteLine("Hello World!");
+            AddressBook addrbook = new AddressBook();
+            addrbook.People.Add(new Person() {Name="abc",Id=10,Email="abc@163.com" });
+            addrbook.People.Add(new Person() {Name="abcd",Id=11,Email="abcd@163.com" });
+
+
+
+            byte[] buffs = new byte[1024];
+            var gstream = new CodedOutputStream(buffs);
+            addrbook.WriteTo(gstream);
+            int i=addrbook.CalculateSize();
+            Console.WriteLine($"c size:{i},buf:{gstream.Position}");
+
+            var istream = new CodedInputStream(buffs,0,i);
+
+            AddressBook book2 = new AddressBook();
+            book2.MergeFrom(istream);
+            Console.WriteLine($"{book2.People[0].Name}");
+
+            
+            //book2.
+
+
 
             //AreaServer area = new AreaServer();
             AreaServer.instance.Start();

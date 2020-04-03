@@ -8,6 +8,8 @@ namespace SharedLib
 
     public class Packet
     {
+        public int id;
+        public int type;
         public byte[] head;
         public byte[] body;
     }
@@ -36,12 +38,19 @@ namespace SharedLib
         State _status = State.HEAD;
 
 
+        public string ReadString(Packet p)
+        {
+            return System.Text.Encoding.Default.GetString(p.body);
+
+        }
         int getPackLen()
         {
             return _headBuf[0] | _headBuf[1] << 8 | _headBuf[2] <<16 | _headBuf[3] <<24;
-
         }
-
+        int ReadInt(byte[] buff, int offset)
+        {
+            return buff[offset+0] | buff[offset+1] << 8 | buff[offset+2] << 16 | buff[offset+3] << 24;
+        }
         void processHead(byte[] buff,int offset,int len, List<Packet> packets)
         { 
             if (len >= HeadLen - _bufOffset)

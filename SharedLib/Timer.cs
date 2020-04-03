@@ -18,7 +18,7 @@ namespace UseLibuv
             _callback = cb;
             _state = state;
 
-            _handle = Libuv.Allocate(Libuv.uv_handle_type.UV_TIMER);
+            _handle = Libuv.Allocate(uv_handle_type.UV_TIMER);
 
             Libuv.uv_timer_init(_eventLoop.Loop, _handle);
 

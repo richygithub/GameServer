@@ -17,7 +17,7 @@ namespace UseLibuv
         readonly object _state;
         public Async(EventLoop loop,Action<object> cb,object state)
         {
-            var handle=Libuv.Allocate(Libuv.uv_handle_type.UV_ASYNC);
+            var handle=Libuv.Allocate(uv_handle_type.UV_ASYNC);
 
             _handle = handle;
 

@@ -9,6 +9,7 @@ using System.Windows.Media.Imaging;
 using System.Diagnostics;
 using Robot.Test;
 using System.Threading.Tasks;
+using SharedLib;
 
 namespace Robot
 {
@@ -116,6 +117,9 @@ namespace Robot
         bool _connecting = false;
         Socket _s;
         TestCase _test;
+
+
+        byte[] _recvBuf = new byte[1024*64];
         public void connectCB (IAsyncResult ar){
 
             //ar.AsyncState;
@@ -159,6 +163,31 @@ namespace Robot
             _test?.Update(this);
         }
 
+        PacketRead pr = new PacketRead();
+        void RecvCB(IAsyncResult r)
+        {
+            try
+            {
+                RobotAgent agent = (RobotAgent)r.AsyncState;
+                int length = agent._s.EndReceive(r);
+
+                List<Packet> plist = new List<Packet>();
+                pr.process(_recvBuf, 0, length, plist);
+
+                foreach(var p in plist)
+                {
+                    string s = pr.ReadString(p);
+                    Trace.WriteLine($"Receive:{length},con:{s}");
+                }
+
+                _s.BeginReceive(_recvBuf, 0, _recvBuf.Length, SocketFlags.None, RecvCB, this);
+
+            }
+            catch (Exception e)
+            {
+                Trace.WriteLine($"Exception:{e}");
+            }
+       }
 
         public async void Start(Type caseType )
         {
@@ -187,6 +216,12 @@ namespace Robot
                 finally
                 {
                     _connecting = false;
+
+                    if (_s.Connected)
+                    {
+                        _s.BeginReceive(_recvBuf,0,_recvBuf.Length, SocketFlags.None, RecvCB,this);
+
+                    }
 
                     _rbtn.SetState( _s.Connected?RobotBtn.State.Work:RobotBtn.State.Error);
  

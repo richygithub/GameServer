@@ -22,13 +22,6 @@ namespace UseLibuv
         public delegate void ChannelAddHandler(Channel channel);
         public event ChannelAddHandler ChannelAddEvent;
 
-        public delegate void ChannelRemoveHandler(Channel channel);
-        public event ChannelRemoveHandler ChannelRemoveEvent;
-
-        void OnChannelRemove(Channel c)
-        {
-            ChannelRemoveEvent?.Invoke(c);
-        }
 
         void OnListenCB(int status)
         {
@@ -38,9 +31,9 @@ namespace UseLibuv
             if (ret == 0)
             {
                 //Libuv.uv_re
-                Channel c = new Channel(tcp );
+                Channel c = new Channel( );
                 tcp.Channel = c;
-                tcp.ChannelRemoveEvent += OnChannelRemove;
+                c.Handle = tcp;
 
                 ChannelAddEvent?.Invoke(c);
 

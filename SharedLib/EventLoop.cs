@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SharedLib;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Net;
@@ -6,76 +7,24 @@ using System.Text;
 
 namespace UseLibuv
 {
-    public class ClientEnd
-    {
-        Dictionary<int, Channel> _servers = new Dictionary<int, Channel>();
 
-        EventLoop _loop;
-
-        
-        public ClientEnd(EventLoop loop)
-        {
-            _loop = loop;
-
-        }
-
-
-        public void Connect(string host, int port)
-        {
-
-        }
-
-    }
-    public class ServerEnd
-    {
-        Dictionary<int, Channel> _clients = new Dictionary<int, Channel>();
-        EventLoop _loop;
-
-
-        TcpListen _tcpHandle;
-        IPEndPoint _ip;
-        public ServerEnd(EventLoop loop,int port)
-        {
-            _loop = loop;
-            //IPEndPoint ep = new IPEndPoint(IPAddress.Any, _port);
-            _tcpHandle = new TcpListen(_loop);
-
-            _tcpHandle.ChannelAddEvent      += AddChannel;
-            _tcpHandle.ChannelRemoveEvent += RemoveChannel;
-
-            _ip = new IPEndPoint(IPAddress.Any, port);
-            _tcpHandle.Bind(_ip);
-        }
-
-        public void Start()
-        {
-            _tcpHandle.Listen();
-        }
-        
-        int _count = 0;
-        public void AddChannel(Channel channel)
-        {
-            channel.Id = _count;
-            _clients.Add(_count,channel);
-            _count++;
-        }
-        public void RemoveChannel(Channel channel)
-        {
-            _clients.Remove(channel.Id);
-        }
-
-
-    }
 
     unsafe public class EventLoop : IDisposable
     {
         IntPtr _loop;
         public IntPtr Loop => _loop;
+
+        public PacketRead PReader { get; set; }
+        public PacketWrite PWriter{ get; set; }
+
+
         public EventLoop()
         {
             _loop = Libuv.CreateLoop();
             Libuv.uv_loop_init(_loop);
             _async = new Async(this, doAsyncJob, null);
+            PReader = new PacketRead();
+            PWriter = new PacketWrite();
 
         }
         ConcurrentQueue<Action> _asyncJobs= new ConcurrentQueue<Action>();
@@ -96,7 +45,7 @@ namespace UseLibuv
         }
         void Update(long dt)
         {
-            Console.WriteLine($"Upate {dt}");
+            //Console.WriteLine($"Upate {dt}");
 
         }
 

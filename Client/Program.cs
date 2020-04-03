@@ -105,9 +105,17 @@ namespace Client
 
     }
 
-    public class Server
+    public struct Server
     {
-        
+
+        public int i;
+        public int j;
+        public Server(int a1,int a2)
+        {
+            i = a1;
+            j = a2;
+
+        }
 
     }
 
@@ -132,8 +140,45 @@ namespace Client
 
 
         }
-       static void Main(string[] args)
+
+
+
+        static void Pro(out Server s)
         {
+
+
+
+            s = new Server(1, 2);
+            getMemory(s);
+
+           
+
+        }
+        static public string getMemory(object o) // 获取引用类型的内存地址方法    
+        {
+            GCHandle h = GCHandle.Alloc(o, GCHandleType.WeakTrackResurrection);
+
+            IntPtr addr = GCHandle.ToIntPtr(h);
+
+            string s="0x" + addr.ToString("X");
+            Console.WriteLine(s);
+            return s;
+        }
+       unsafe static void Main(string[] args)
+        {
+
+            Server s = new Server(2,3);
+
+            getMemory(s);
+
+            Pro(out s);
+
+
+
+
+
+
+            /*
 
             Handler h = new Handler();
             Test(h);
@@ -168,33 +213,7 @@ namespace Client
             });
             c.Start(1000);
 
-
-
-           //DispatcherTimer 
-
-            /*
-            Socket s = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-            IPAddress ip = IPAddress.Parse(ipstr);
-
-            var addr = new IPEndPoint(ip, port);
-            //s.Bind(new IPEndPoint(ip, port));
-            s.Connect(addr);
-
-            Console.WriteLine("connect");
-
-            PacketWrite pw = new PacketWrite();
-
-            s.Send(pw.Write("it is a client"));
-
-            while (true)
-            {
-                string str = Console.ReadLine();
-                s.Send(pw.Write(str));
-
-
-            }
-
-    */
+*/
 
 
         }

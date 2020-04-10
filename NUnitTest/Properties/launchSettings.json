@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "NUnitTest": {
+      "commandName": "Project",
+      "nativeDebugging": true
+    }
+  }
+}

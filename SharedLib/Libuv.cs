@@ -231,6 +231,20 @@ namespace UseLibuv
         UV_REQ_TYPE_PRIVATE,
         UV_REQ_TYPE_MAX
     }
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    public delegate void uv_work_cb(IntPtr watcher);
+
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    public delegate void uv_watcher_cb(IntPtr watcher, int status);
+
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    public delegate void uv_close_cb(IntPtr conn);
+
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    public delegate void uv_alloc_cb(IntPtr handle, IntPtr suggested_size, out uv_buf_t buf);
+
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    public delegate void uv_read_cb(IntPtr handle, IntPtr nread, ref uv_buf_t buf);
 
     public unsafe static class Libuv
     {
@@ -242,24 +256,6 @@ namespace UseLibuv
         };
 
         private const string LibraryName = "libuv";
-
-
-
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        public delegate void uv_work_cb(IntPtr watcher);
-
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        public delegate void uv_watcher_cb(IntPtr watcher, int status);
-
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        public delegate void uv_close_cb(IntPtr conn);
-
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        public delegate void uv_alloc_cb(IntPtr handle, IntPtr suggested_size, out uv_buf_t buf);
-
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        public delegate void uv_read_cb(IntPtr handle, IntPtr nread, ref uv_buf_t buf);
-
 
 
         [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
@@ -320,6 +316,10 @@ namespace UseLibuv
 
         [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
         public static extern int uv_tcp_bind(IntPtr handle, ref sockaddr sockaddr, uint flags);
+
+
+        [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
+        internal static extern int uv_tcp_connect(IntPtr req, IntPtr handle, ref sockaddr sockaddr, uv_watcher_cb connect_cb);
 
 
         [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]

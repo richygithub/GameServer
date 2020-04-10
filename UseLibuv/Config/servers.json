@@ -1,0 +1,24 @@
+{
+    "connector": [
+        {"id":1, "name": "connector-server-1", "host": "192.168.25.199", "frontHost":"192.168.25.199", "port": 3010, "clientPort": 3110, "frontend": true },
+        {"id":2, "name": "connector-server-2", "host": "192.168.25.199", "frontHost":"192.168.25.199", "port": 3011, "clientPort": 3111, "frontend": true }
+   ],
+    "area": [
+        {"id":100, "name": "area-server-1", "host": "192.168.25.199", "port": 6010, "area": 1, "country":1, "subtype":"country"},
+        {"id":101, "name": "area-server-2", "host": "192.168.25.199", "port": 6011, "area": 1, "country":2, "subtype":"country"},
+        {"id":102, "name": "area-server-3", "host": "192.168.25.199", "port": 6012, "area": 1, "country":3, "subtype":"country"}
+   ],
+    "chat": [
+        {"id":200, "name":"chat-server-1","host":"192.168.25.199","port":5041, "neighborHost":"192.168.25.199", "neighborPort":5042}
+    ],
+   "gate": [
+        {"id":400, "name": "gate-server-1", "host": "192.168.25.199", "frontHost":"192.168.25.199", "clientPort": 5011, "port":5012, "frontend": true}
+    ],
+    "manager": [
+        {"id":500, "name":"manager-server-1","host":"192.168.25.199","port":5021, "neighborHost":"192.168.25.199", "neighborPort":5022, "payHost":"192.168.25.199", "payPort":8090, "subtype":"country"}
+    ],
+
+    "dataCenter": [
+        {"id":600, "name":"dataCenter-server-1","host":"192.168.25.199","port":5061, "country":[1,2,3,4,5,6,7,8,11],"auction":true,"global":true, "chat":true}
+    ]
+}

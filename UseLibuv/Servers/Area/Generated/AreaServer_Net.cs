@@ -18,8 +18,7 @@ namespace Area.PlayerHandler
     }
 }
 
-namespace UseLibuv.Servers.AreaServer.Generated
-{
+namespace UseLibuv{
 
     public class Client: ClientEnd
     {
@@ -44,6 +43,15 @@ namespace UseLibuv.Servers.AreaServer.Generated
                 TaskCompletionSource<int> ts = new TaskCompletionSource<int>();
 
                 //c.Send();
+                int len = OutputStream.GetSize(s);
+                int pId = c.CurPacketId;
+
+                int pSize = OutputStream.GetSize(pId);
+
+                c.OStream.WriteInt32(len+pId );
+                c.OStream.WriteString(s);
+
+                c.Send();
                 
 
                 return ts.Task;
@@ -120,17 +128,6 @@ namespace UseLibuv.Servers.AreaServer.Generated
         }
         */
 
-        public static void Process(Channel c,Packet p)
-        {
-            switch (p.type)
-            {
-                //case 0:
-
-                default:
-                    break;
-            }
-
-        }
         static public async void Test()
         {
             //int i=HandleHelper.Area.GateHandler.GetNum(100);

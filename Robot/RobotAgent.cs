@@ -176,8 +176,8 @@ namespace Robot
 
                 foreach(var p in plist)
                 {
-                    string s = pr.ReadString(p);
-                    Trace.WriteLine($"Receive:{length},con:{s}");
+                    //string s = pr.ReadString(p);
+                    //Trace.WriteLine($"Receive:{length},con:{s}");
                 }
 
                 _s.BeginReceive(_recvBuf, 0, _recvBuf.Length, SocketFlags.None, RecvCB, this);

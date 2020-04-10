@@ -8,9 +8,10 @@ namespace SharedLib
 
     public class Packet
     {
-        public int id;
-        public int type;
-        public byte[] head;
+        public int len;
+        public uint seqId;
+        public byte packetType;
+        public byte serverType;
         public byte[] body;
     }
 
@@ -27,84 +28,72 @@ namespace SharedLib
             BODY
         }
 
-        public const int HeadLen = 8;
+        public const int HeadLen = 4;
 
         int _bodyLen = 0;
         int _bufOffset = 0;
 
-        byte[] _headBuf = new byte[HeadLen];
         byte[] _bodyBuf;
-
         State _status = State.HEAD;
 
+        int _packetLen = 0;
+        int _shift = 0;
 
-        public string ReadString(Packet p)
-        {
-            return System.Text.Encoding.Default.GetString(p.body);
-
-        }
         int getPackLen()
         {
-            return _headBuf[0] | _headBuf[1] << 8 | _headBuf[2] <<16 | _headBuf[3] <<24;
+            return _packetLen;
         }
-        int ReadInt(byte[] buff, int offset)
+        void processHead(byte[] buff,int offset,int limit, List<Packet> packets)
         {
-            return buff[offset+0] | buff[offset+1] << 8 | buff[offset+2] << 16 | buff[offset+3] << 24;
-        }
-        void processHead(byte[] buff,int offset,int len, List<Packet> packets)
-        { 
-            if (len >= HeadLen - _bufOffset)
+            int readLen = 0;
+            bool finish = false;
+            
+            do
             {
-                int readLen = HeadLen - _bufOffset;
+                byte b = buff[offset++];
+                _packetLen |= (b & 0x7F) << _shift;
 
+                if (b < 0x80)
+                {
+                    finish = true;
+                    break;
+                }
+                readLen++;
+            }
+            while (_shift < 32 && offset< limit);
 
-                Buffer.BlockCopy(buff, offset , _headBuf, _bufOffset, readLen );
-
-
-                _bodyLen = getPackLen();
-
-                Debug.Assert(_bodyLen < 16*1024 && _bodyLen>=0 );
-
+            if( _shift == 32 || finish)
+            {
                 _status = State.BODY;
+                _bodyLen = _packetLen ;
                 _bodyBuf = new byte[_bodyLen];
                 _bufOffset = 0;
+                _shift = 0;
 
-                if(len > readLen )
+                if( offset < limit)
                 {
-                    processBody(buff, offset + readLen, len -readLen ,packets);
+                    processBody(buff, offset  ,limit , packets);
                 }
-
             }
-            else
-            {
-                Buffer.BlockCopy(buff, offset, _headBuf, _bufOffset, len );
-                _bufOffset += len ;
-
-
-            }
-
 
         }
-        void processBody(byte[] buff,int offset,int len, List<Packet> packets)
+        void processBody(byte[] buff,int offset,int limit, List<Packet> packets)
         {
+            int len = limit - offset;
             if( len >= _bodyLen - _bufOffset )
             {
                 int readLen = _bodyLen - _bufOffset;
 
-
                 Buffer.BlockCopy( buff, offset, _bodyBuf , _bufOffset, readLen );
                 //finish
-                Packet p = new Packet() { head = _headBuf, body = _bodyBuf };
+                Packet p = new Packet() { body = _bodyBuf };
                 packets.Add(p);
 
-
                 _status = State.HEAD;
-                _bufOffset = 0;
-                _headBuf = new byte[HeadLen];
                 //int left = len - offset - _leftlen;
                 if( len > readLen )
                 {
-                    processHead( buff, offset + readLen ,len - readLen , packets );
+                    processHead( buff, offset + readLen ,limit , packets );
                 }
 
             }
@@ -116,16 +105,15 @@ namespace SharedLib
 
         }
 
-        public void process(byte[] buff,int offset,int len,List<Packet> packets )
+        public void process(byte[] buff,int offset,int limit,List<Packet> packets )
         {
-
             if(_status == State.HEAD)
             {
-                processHead(buff, offset,len,packets);
+                processHead(buff, offset, limit, packets);
             }
             else
             {
-                processBody(buff, offset,len,packets);
+                processBody(buff, offset, limit, packets);
             }
         }
     }

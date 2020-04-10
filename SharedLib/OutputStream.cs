@@ -1,15 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text;
 
 namespace UseLibuv
 {
-    public class OutputStream
+    public partial class OutputStream
     {
         internal static readonly Encoding Utf8Encoding = Encoding.UTF8;
         byte[] _buff;
         int _len;
         int _pos;
+
+
+
+        public int Length => _pos;
+        public int EmptyLength => _len - _pos;
         public OutputStream(byte[] buff)
         {
             _buff = buff;
@@ -17,14 +23,48 @@ namespace UseLibuv
             _pos = 0;
         }
 
+        public void CleanUp()
+        {
+            _pos = 0;
+        }
+
+        /*
+                [Conditional("Debug")]
+                public void Write<T>(T value)
+                {
+
+                }
+                */
+        public void WriteUInt32(uint value)
+        {
+            WriteVarint32(value);
+            //WriteFixed32( (uint)value);
+        }
         public void WriteInt32(int value)
         {
-            WriteFixed32( (uint)value);
+            WriteVarint32((uint)value );
+            //WriteFixed32( (uint)value);
         }
+        public void WriteInt64(long value)
+        {
+            WriteRawVarint64((ulong)value);
+        }
+
+
         public void WriteBool(bool value)
         {
             WriteByte(value ? (byte)1 : (byte)0);
         }
+
+        
+        public void WriteRawByte(byte[] bytes,int offset,int len)
+        {
+            Buffer.BlockCopy( bytes,offset,_buff,_pos,len );
+        }
+
+
+
+
         public void WriteString(string value)
         {
             // Optimise the case where we have enough space to write
@@ -35,18 +75,19 @@ namespace UseLibuv
             {
                 for (int i = 0; i < length; i++)
                 {
-                    buffer[position + i] = (byte)value[i];
+                    _buff[_pos + i] = (byte)value[i];
                 }
             }
             else
             {
-                Utf8Encoding.GetBytes(value, 0, value.Length, buffer, position);
+                Utf8Encoding.GetBytes(value, 0, value.Length, _buff, _pos);
             }
-            position += length;
+            _pos += length;
         }
         public void WriteLength(int length)
         {
-            WriteFixed32((uint)length);
+            WriteVarint32((uint)length);
+            //WriteFixed32((uint)length);
         }
 
         internal void WriteByte(byte value)
@@ -61,7 +102,7 @@ namespace UseLibuv
             _buff[_pos++] = ((byte)(value >> 24));
         }
 
-        internal bool WriteRawVarint32(uint value)
+        internal bool WriteVarint32(uint value)
         {
             // Optimize for the common case of a single byte value
             if (value < 128 && _pos < _len )
@@ -80,6 +121,27 @@ namespace UseLibuv
                 return false;
             }
 
+            _buff[_pos++] = (byte)value;
+
+            return true;
+        }
+
+        internal bool WriteRawVarint64(ulong value)
+        {
+            while (value > 127 && _pos < _len)
+            {
+                _buff[_pos++] = (byte)((value & 0x7F) | 0x80);
+                value >>= 7;
+            }
+            while (value > 127 && _pos < _len )
+            {
+                _buff[_pos++] = (byte)((value & 0x7F) | 0x80);
+                value >>= 7;
+            }
+            if (value > 127 || _pos >= _len)
+            {
+                return false;
+            }
             _buff[_pos++] = (byte)value;
 
             return true;

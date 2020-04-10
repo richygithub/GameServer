@@ -35,7 +35,7 @@ namespace UseLibuv
         }
         void OnWorkCallback()
         {
-            _callback?.Invoke(_state);
+            _callback?.Invoke(this);
         }
 
         public void Start(long interval,long repeated)

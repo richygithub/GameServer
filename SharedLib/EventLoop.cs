@@ -74,6 +74,21 @@ namespace UseLibuv
 
         }
 
+        //to do performance
+        // dispose .
+        public Timer StartTimer(uint interval,bool repeat,Action action)
+        {
+            Timer t = new Timer(this, (obj) =>
+            {
+                action();
+                if (!repeat)
+                {
+                    ((Timer)obj).Dispose();
+                }
+            },null);
+            t.Start(interval, repeat ? interval : 0);
+            return t;
+        }
 
 
 

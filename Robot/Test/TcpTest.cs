@@ -7,9 +7,9 @@ namespace Robot.Test
 {
     interface TestCase
     {
-        void Update(RobotAgent robot); 
+        void Update(RobotAgent robot);
     }
-    public class TcpTest:TestCase
+    public class TcpTest : TestCase
     {
         public TcpTest()
         {
@@ -18,8 +18,9 @@ namespace Robot.Test
         PacketWrite pw;
         public void Update(RobotAgent robot)
         {
-            var msg = pw.Write($"It is robot {robot.Id}");
+            var msg = pw.Write($"It is robot {robot.Id}",1);
             robot.Send(msg);
         }
     }
 }
+

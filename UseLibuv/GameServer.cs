@@ -22,7 +22,6 @@ namespace UseLibuv
         //Handler<T> _handler = new Handler<T>();
         //Remote<T>  _remote  = new Remote<T>();
          abstract  public void Start();
-        
 
 
 

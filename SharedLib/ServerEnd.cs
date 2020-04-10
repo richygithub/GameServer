@@ -13,10 +13,10 @@ namespace UseLibuv
 
         //Dictionary<int,
 
-        Dispatcher _dispatcher;
+        IDispatcher _dispatcher;
         TcpListen _tcpHandle;
         IPEndPoint _ip;
-        public ServerEnd(EventLoop loop, Dispatcher dispatcher, int port)
+        public ServerEnd(EventLoop loop, IDispatcher dispatcher, int port)
         {
             _loop = loop;
             //IPEndPoint ep = new IPEndPoint(IPAddress.Any, _port);

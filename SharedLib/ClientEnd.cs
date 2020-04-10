@@ -6,14 +6,16 @@ namespace UseLibuv
 {
     public class ClientEnd
     {
-        Dictionary<int, Channel> _servers = new Dictionary<int, Channel>();
+        //Dictionary<int, Channel> _servers = new Dictionary<int, Channel>();
 
         EventLoop _loop;
+        Channel _channel;
 
 
         public ClientEnd(EventLoop loop)
         {
             _loop = loop;
+            _channel = new Channel();
 
         }
 

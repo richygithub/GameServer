@@ -1,7 +1,10 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
+using System.Collections.Generic;
 using System.IO;
 
 namespace CodeGenerator
@@ -15,6 +18,9 @@ namespace CodeGenerator
         const string handlerDirName = "Handler";
 
         const string remoteDirName = "Remote";
+
+        const string configDirName = "Config";
+
 
 
 
@@ -80,11 +86,83 @@ namespace CodeGenerator
             }
         }
 
+        class ServerCfg
+        {
+            public int id;
 
+            [JsonProperty]
+            public string name { get; }
+            public string frontHost;
+            public bool frontEnd;
+        }
+
+
+        public class CfgMgr
+        {
+            private CfgMgr()
+            {
+
+                Console.WriteLine("private CfgMgr");
+            }
+            static CfgMgr()
+            {
+                Console.WriteLine("static CfgMgr");
+            }
+            private static readonly CfgMgr _instance = new CfgMgr();
+            public static CfgMgr Instance => _instance;
+
+
+
+
+        }
+
+        static void ProcessConfig(string dir)
+        {
+            string serverCfg = Path.Join(dir, configDirName, "servers.json");
+            //var c = CfgMgr.Instance;
+            if (!File.Exists(serverCfg))
+            {
+                Console.WriteLine($"Error! not find config file!{serverCfg}");
+                return;
+            }
+            //JsonConvert.
+            string json = "[{'id':1,'age':100,'name':'abcde'},{'id':2,'name':'abcde1'}]";
+            List<ServerCfg> a = JsonConvert.DeserializeObject< List<ServerCfg> >(json);
+            Console.WriteLine($"{a[1].id}:{a[1].name}");
+            using ( StreamReader sr = new StreamReader(serverCfg) )
+            {
+                var jobj =JObject.Parse( sr.ReadToEnd());
+                foreach(var kv in jobj)
+                {
+                    Console.WriteLine($"key:{kv.Key}");
+ 
+                    List<ServerCfg> slist = JsonConvert.DeserializeObject<List<ServerCfg>>(kv.Value.ToString());
+                    foreach(var s in slist)
+                    {
+                        Console.WriteLine($"{s.id},{s.name},{s.frontHost==null},{s.frontEnd}");
+                    }
+                    //Console.WriteLine($"key:{kv.Value}");
+                }
+
+                
+
+                GenServers.GenerateServers(jobj, dir);
+            }
+
+
+
+        }
+        static int __LINE__([System.Runtime.CompilerServices.CallerLineNumber] int lineNumber = 0)
+        {
+            return lineNumber;
+        }
+        static string __FILE__([System.Runtime.CompilerServices.CallerFilePath] string fileName = "")
+        {
+            return fileName;
+        }
         static void Main(string[] args)
         {
-            //Console.WriteLine("Hello World!");
-            string projDir;
+           string projDir;
             if ( args.Length>0)
             {
                 projDir = args[0];
@@ -106,6 +184,9 @@ namespace CodeGenerator
                 //编译错误
                 return;
             }
+
+            ProcessConfig(projDir);
+            return;
 
             DirectoryInfo serverRoot = new DirectoryInfo(dir);
 

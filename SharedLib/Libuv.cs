@@ -358,6 +358,22 @@ namespace UseLibuv
         public static extern int uv_is_closing(IntPtr handle);
 
 
+        [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
+        static extern IntPtr uv_strerror(uv_err_code err);
+
+        [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
+        static extern IntPtr uv_err_name(uv_err_code err);
+        internal static OperationException CreateError(uv_err_code error)
+        {
+            IntPtr ptr = uv_err_name(error);
+            string name = ptr != IntPtr.Zero ? Marshal.PtrToStringAnsi(ptr) : null;
+
+            ptr = uv_strerror(error);
+            string description = ptr != IntPtr.Zero ? Marshal.PtrToStringAnsi(ptr) : null;
+
+            return new OperationException((int)error, name, description);
+        }
+
         public static int GetSize(uv_handle_type handleType) => uv_handle_size(handleType).ToInt32();
 
         public static int GetSize(uv_req_type reqType) => uv_req_size(reqType).ToInt32();

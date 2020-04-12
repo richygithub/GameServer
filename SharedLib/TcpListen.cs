@@ -10,7 +10,7 @@ namespace UseLibuv
         public TcpListen(EventLoop loop) : base(loop)
         {
         }
-        static Libuv.uv_watcher_cb ListenCB = OnListenCB;
+        static uv_watcher_cb ListenCB = OnListenCB;
         static void OnListenCB(IntPtr watcher, int status)
         {
             //Console.WriteLine("accept!!");

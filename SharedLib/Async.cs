@@ -10,7 +10,7 @@ namespace UseLibuv
         EventLoop _eventLoop;
 
 
-        static readonly Libuv.uv_work_cb WorkCallback = OnWorkCallback;
+        static readonly uv_work_cb WorkCallback = OnWorkCallback;
 
 
         readonly Action<object> _callback;

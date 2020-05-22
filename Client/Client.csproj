@@ -17,6 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Proto\Proto.csproj" />
     <ProjectReference Include="..\SharedLib\SharedLib.csproj" />
   </ItemGroup>
 

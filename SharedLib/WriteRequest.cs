@@ -13,7 +13,7 @@ namespace UseLibuv
         public event OnWrite OnWriteEvent;
 
 
-        static public Libuv.uv_watcher_cb OnWriteCB = OnWriteCallback;
+        static public uv_watcher_cb OnWriteCB = OnWriteCallback;
 
         public WriteRequest(uv_req_type requestType,IntPtr buf, int len ) : base(requestType,len)
         {

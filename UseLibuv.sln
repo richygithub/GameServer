@@ -18,7 +18,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeGenerator", "CodeGenera
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Protobuf", "Protobuf\Protobuf.csproj", "{18DBCF7F-9E56-4076-B386-E768E1C1B871}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NUnitTest", "NUnitTest\NUnitTest.csproj", "{3AF4B1AE-9BDB-4911-84EA-03334BD61B42}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NUnitTest", "NUnitTest\NUnitTest.csproj", "{3AF4B1AE-9BDB-4911-84EA-03334BD61B42}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Proto", "Proto\Proto.csproj", "{6973E4BA-FCD5-4163-85F4-4C6E0DB3C18B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -54,6 +56,10 @@ Global
 		{3AF4B1AE-9BDB-4911-84EA-03334BD61B42}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3AF4B1AE-9BDB-4911-84EA-03334BD61B42}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3AF4B1AE-9BDB-4911-84EA-03334BD61B42}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6973E4BA-FCD5-4163-85F4-4C6E0DB3C18B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6973E4BA-FCD5-4163-85F4-4C6E0DB3C18B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6973E4BA-FCD5-4163-85F4-4C6E0DB3C18B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6973E4BA-FCD5-4163-85F4-4C6E0DB3C18B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -10,7 +10,7 @@ namespace UseLibuv
 
 
 
-        static readonly Libuv.uv_close_cb CloseCallback = OnCloseHandle;
+        static readonly uv_close_cb CloseCallback = OnCloseHandle;
         protected IntPtr _handle;
         public IntPtr Handle => _handle;
 

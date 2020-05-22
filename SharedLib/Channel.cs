@@ -1,4 +1,5 @@
 ﻿using Google.Protobuf;
+using Proto;
 using SharedLib;
 using System;
 using System.Collections.Generic;
@@ -84,6 +85,8 @@ namespace UseLibuv
         }
         ~Channel() => Dispose(false);
         int _packetId = 0;
+
+        /*
         public void Send(string s, PacketWrite p)
         {
             //to do ,缓存
@@ -94,6 +97,7 @@ namespace UseLibuv
                 DoSend();
             }
         }
+        */
         static int GetFullPacketSize(Packet p)
         {
             int len = p.seqId == 0 ? p.len : p.len + OutputStream.GetSize(p.seqId);

@@ -1,4 +1,5 @@
-﻿using SharedLib;
+﻿using Proto;
+using SharedLib;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -9,8 +10,8 @@ namespace UseLibuv
     public class ClientProxy
     {
 
-        RemoteServerEnd[] _servers;
-        delegate int Router(RemoteServerEnd[] servers);
+        ClientEnd[] _clientRpc;
+        delegate int Router(ClientEnd[] servers);
 
         Router route;
 
@@ -18,17 +19,18 @@ namespace UseLibuv
         public ClientProxy(EventLoop loop,List<ServerCfg> servers)
         {
             _eventLoop = loop;
-            _servers = new RemoteServerEnd[ servers.Count ];
+            _clientRpc = new ClientEnd[ servers.Count ];
 
             for (int idx = 0; idx < servers.Count; idx++)
             {
-                _servers[idx] = new RemoteServerEnd( servers[idx] );
+                var cfg = servers[idx];
+                _clientRpc[idx] = new ClientEnd(_eventLoop, cfg.host,cfg.port);
             }
         }
         public void Forward(Packet p )
         {
-            int idx = route == null ? route(_servers) : 0;
-            _servers[idx].c.Send(p);
+            int idx = route == null ? route(_clientRpc) : 0;
+            //_servers[idx].OutputStream.(p);
 
         }
 

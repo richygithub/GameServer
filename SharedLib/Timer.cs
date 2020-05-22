@@ -11,7 +11,7 @@ namespace UseLibuv
         object _state;
         readonly Action<object> _callback;
 
-        static readonly Libuv.uv_work_cb WorkCallback = OnWorkCallback;
+        static readonly uv_work_cb WorkCallback = OnWorkCallback;
         public Timer(EventLoop loop, Action<object> cb,object state)
         {
             _eventLoop = loop;

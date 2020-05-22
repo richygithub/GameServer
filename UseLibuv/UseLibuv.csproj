@@ -17,11 +17,13 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Protobuf\Protobuf.csproj" />
+    <ProjectReference Include="..\Proto\Proto.csproj" />
     <ProjectReference Include="..\SharedLib\SharedLib.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <Folder Include="Proto\" />
+    <Folder Include="Client\" />
   </ItemGroup>
 
   <Target Name="PreBuild" BeforeTargets="PreBuildEvent">

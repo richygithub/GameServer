@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Proto;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -7,6 +8,7 @@ namespace SharedLib
     public class PacketWrite
     {
 
+        /*
         public byte[] Write(string str,int packetId)
         {
             byte[] byteArray = System.Text.Encoding.Default.GetBytes(str);
@@ -49,7 +51,7 @@ namespace SharedLib
 
             return PacketRead.HeadLen + len;
         }
-
+*/
 
 
     }

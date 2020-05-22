@@ -1,4 +1,5 @@
-﻿using SharedLib;
+﻿using Proto;
+using SharedLib;
 using System;
 using System.Collections.Generic;
 using System.Net;
@@ -17,6 +18,15 @@ namespace UseLibuv
         IDispatcher _dispatcher;
         PacketRead _packetRead = new PacketRead();
         IPEndPoint _ip;
+
+        bool _connected;
+        bool Connected => _connected;
+        public OutputStream OutputStream => _channel.OStream;
+
+
+        public delegate void OnConnectedCB(bool suc);
+        public event OnConnectedCB OnConnectEvent;
+
         public ClientEnd(EventLoop loop, string host, int port)
         {
             _loop = loop;
@@ -26,6 +36,7 @@ namespace UseLibuv
 
             _handle.Channel = _channel;
             _channel.Handle = _handle;
+            _connected = false;
         }
 
         void OnReadCB(Channel c, byte[] buff, int nread)
@@ -35,7 +46,7 @@ namespace UseLibuv
                 //remove
                 //RemoveChannel(c);
                 //Console.WriteLine($"remove channel:{c.Id}");
-
+                _connected = false;
             }
             else
             {
@@ -54,17 +65,19 @@ namespace UseLibuv
             if( request.Error != null)
             {
                 //
-                Console.WriteLine($"Connect error!");
+                Console.WriteLine($"Connect error!{request.Error}");
 
                 request.Dispose();
+                OnConnectEvent?.Invoke(false);
 
             }
             else
             {
+
+                _connected = true;
                 _channel.OnReadEvent += OnReadCB;
                 //_channel.OnWriteEvent +=
-
-
+                OnConnectEvent?.Invoke(true);
             }
 
         }

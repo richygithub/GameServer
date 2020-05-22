@@ -18,8 +18,10 @@ namespace Robot.Test
         PacketWrite pw;
         public void Update(RobotAgent robot)
         {
+            /*
             var msg = pw.Write($"It is robot {robot.Id}",1);
             robot.Send(msg);
+            */
         }
     }
 }

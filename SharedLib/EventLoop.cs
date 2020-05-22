@@ -1,4 +1,5 @@
-﻿using SharedLib;
+﻿using Proto;
+using SharedLib;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -15,7 +16,6 @@ namespace UseLibuv
         public IntPtr Loop => _loop;
 
         public PacketRead PReader { get; set; }
-        public PacketWrite PWriter{ get; set; }
 
 
         public EventLoop()
@@ -24,7 +24,6 @@ namespace UseLibuv
             Libuv.uv_loop_init(_loop);
             _async = new Async(this, doAsyncJob, null);
             PReader = new PacketRead();
-            PWriter = new PacketWrite();
 
         }
         ConcurrentQueue<Action> _asyncJobs= new ConcurrentQueue<Action>();

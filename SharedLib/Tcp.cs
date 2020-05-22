@@ -12,8 +12,8 @@ namespace UseLibuv
 
         public Channel Channel{get;set;}
 
-        static public Libuv.uv_alloc_cb AllocCB = OnAllocCB;
-        static public Libuv.uv_read_cb ReadCB = OnReadCB;
+        static public uv_alloc_cb AllocCB = OnAllocCB;
+        static public uv_read_cb ReadCB = OnReadCB;
 
 
         void OnReadCB(IntPtr num)

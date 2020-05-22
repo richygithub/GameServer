@@ -3,6 +3,7 @@ using System;
 using UseLibuv;
 using SharedLib;
 using System.Collections.Generic;
+using Proto;
 
 namespace NUnitTest
 {
@@ -141,6 +142,7 @@ namespace NUnitTest
         {
             int id = 3;
 
+            ostream.WritePacketHead((byte)PacketType.HEART_BEAT,0 );
             int size = 0;
             foreach (var v in values)
             {
@@ -148,7 +150,8 @@ namespace NUnitTest
             }
             int psize = OutputStream.GetSize(id);
 
-            ostream.WriteInt32(psize + size);
+            //ostream.WriteInt32(psize + size);
+            ostream.WritePacketHead((byte)PacketType.REQ, (uint)(psize + size));
             ostream.WriteInt32(id);
 
             foreach (var v in values)
@@ -179,11 +182,16 @@ namespace NUnitTest
                 i += smallBuffLen;
             }
 
-            Assert.IsTrue(packets.Count == 1);
+            Assert.IsTrue(packets.Count == 2);
 
-            Packet p = packets[0];
+            Packet hearbeat = packets[0];
+            Assert.IsTrue(hearbeat.packetType == (byte)PacketType.HEART_BEAT);
+ 
+            Packet p = packets[1];
+            Assert.IsTrue(p.packetType == (byte)PacketType.REQ);
             InputStream stream = new InputStream(p.body);
 
+            
             int id2 = stream.ReadInt32();
             Assert.IsTrue(id == id2);
             foreach (var obj in values)
@@ -206,12 +214,23 @@ namespace NUnitTest
                 }
 
             }
+        }
 
+        //[TestCase("",)]
+        [Test]
+        public void Test_ClientRpc()
+        {
+            string host= "121.36.16.144";
+            int port = 11240;
 
+            EventLoop loop = new EventLoop();
 
+            ClientEnd c = new ClientEnd(loop, host, port);
+            c.Connect();
 
+            loop.Run();
 
-
+                 
         }
 
     }

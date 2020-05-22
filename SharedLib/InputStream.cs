@@ -77,6 +77,10 @@ namespace UseLibuv
         {
             return (int)ReadVarint32();
         }
+        public uint ReadUInt32()
+        {
+            return ReadVarint32();
+        }
         public long ReadInt64()
         {
             return (long)ReadRawVarint64();

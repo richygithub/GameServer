@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using UseLibuv;
+using Proto;
 
 namespace UseLibuv 
 {
@@ -24,12 +25,16 @@ namespace UseLibuv
         public RpcClient(EventLoop loop)
         {
             _eventLoop = loop;
-            _remoteServers = new RemoteServers();
+            _remoteServers = new RemoteServers(_eventLoop);
         }
         public void Forward(Channel c,Packet p)
         {
             byte packetType = p.packetType;
-            byte serverType = p.serverType;
+
+            //uint service = byte serverType = Packet.GetServiceServerType(service);
+
+            //uint serviceId = Packet.GetServiceId(service);
+            byte serverType = Packet.GetServiceServerType(p.serviceId);
 
             if ((byte)PacketType.REQ == packetType)
             {
@@ -72,14 +77,7 @@ namespace UseLibuv
 
     }
 
-    public enum PacketType
-    {
-        HEART_BEAT = 0,
-        REQ        = 1,
-        NOTIFY     = 2,
-        RESP       = 3,
-        PUSH       = 4, 
-    }
+
 
 
     public class Dispatcher :IDispatcher
@@ -89,13 +87,13 @@ namespace UseLibuv
 
         delegate void PacketProcess(Channel c, Packet p);
 
-        EventLoop _eventLoop;
+        EventLoop _workLoop;
 
         Dictionary<int, WeakReference<Channel>> _cb = new Dictionary<int, WeakReference<Channel>>();
 
         public Dispatcher(EventLoop loop)
         {
-            _eventLoop = loop;
+            _workLoop = loop;
             _remoteServer = new RemoteServers(loop);
         }
         InputStream istream = new InputStream();
@@ -106,40 +104,99 @@ namespace UseLibuv
 
         int _transferId = 0;
 
+        void Register()
+        {
+            /*
+            = () =>
+            {
+                
+            }
+            */
+        }
 
-        public void Process(EventLoop loop,Channel c, List<Packet> packets)
+        void HandlePacket(EventLoop netloop,Channel c, Packet p)
+        {
+
+            if (_workLoop != netloop)
+            {
+                _workLoop.AddAsyncJob(() =>
+                {
+                    //byte[] buff = loop.PWriter.Write("abcde");
+
+                    //c.Send("abcde",loop.PWriter);
+
+                    int xx;
+                    string bbb;
+                    switch (p.serviceId){
+                        case 1:
+                            break;
+                        default:
+                            break;
+                    }
+
+                    netloop.AddAsyncJob(() =>
+                    {
+
+                        c.Send();
+                    });
+                    
+                    //c.Send()
+
+
+
+                });
+            }
+            else
+            {
+                Packet ret = new Packet();
+                //byte[] buff = loop.PWriter.Write("abcde");
+                //c.Send(buff);
+                //c.Send("abcde",loop.PWriter);
+
+            }
+        } 
+        void ForwardPacket(EventLoop netloop, Packet p)
+        {
+            //直接send
+
+        }
+        
+        public void Process(EventLoop netloop,Channel c, List<Packet> packets)
         {
             //?
             foreach(var p in packets)
             {
                 istream.SetUp(p.body, p.len);
 
-                byte serverType = istream.ReadByte();
 
-                byte packetType = istream.ReadByte();
-                p.serverType = serverType;
+                //byte serverType = istream.ReadByte();
+                byte packetType = p.packetType;
+                //p.serverType = serverType;
                 p.packetType = packetType;
+                uint service = istream.ReadUInt32();
+                p.serviceId = service;
+
+                byte serverType = Packet.GetServiceServerType(service);
+
+                uint serviceId  = Packet.GetServiceId(service);
+
+
+                Console.WriteLine($"Process Server Type:{serverType},{serviceId}");
 
                 if(_serverType == serverType)
                 {
                     //process
+                    HandlePacket(netloop,c, p);
 
                 }
                 else
                 {
                     //router
+                    ForwardPacket(netloop, p);
 
-
-                    _remoteServer[serverType]?.Forward(p);
+                    //_remoteServer[serverType]?.Forward(p);
 
                 }
-
-
-
-
-                int serviceId = istream.ReadInt32();
-                //check router or process
-
 
 
 
@@ -147,18 +204,18 @@ namespace UseLibuv
             }
 
 
-            if ( _eventLoop != loop)
+            if ( _workLoop != netloop)
             {
-                _eventLoop.AddAsyncJob(() =>
+                _workLoop.AddAsyncJob(() =>
                 {
                 //process
                     Packet ret = new Packet();
 
-                    loop.AddAsyncJob(() =>
+                    netloop.AddAsyncJob(() =>
                     {
                        //byte[] buff = loop.PWriter.Write("abcde");
 
-                       c.Send("abcde",loop.PWriter);
+                       //c.Send("abcde",loop.PWriter);
                     });
                 });
             }
@@ -167,7 +224,7 @@ namespace UseLibuv
                 Packet ret = new Packet();
                 //byte[] buff = loop.PWriter.Write("abcde");
                 //c.Send(buff);
-                c.Send("abcde",loop.PWriter);
+                //c.Send("abcde",loop.PWriter);
  
             }
             

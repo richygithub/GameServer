@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Proto;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
@@ -13,6 +14,7 @@ namespace UseLibuv
         int _pos;
 
 
+        public byte[] Buff => _buff;
 
         public int Length => _pos;
         public int EmptyLength => _len - _pos;
@@ -63,6 +65,19 @@ namespace UseLibuv
         }
 
 
+
+
+        public void WritePacketHead(byte type,uint len)
+        {
+            ulong head = Packet.GetPacketHead(type, len);
+            WriteRawVarint64(head);
+        }
+        
+        public void WriteService(byte serverType,uint serviceId )
+        {
+            uint service = Packet.GetService(serverType, serviceId);
+            WriteUInt32(service);
+        }
 
 
         public void WriteString(string value)

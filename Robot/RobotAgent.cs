@@ -10,6 +10,7 @@ using System.Diagnostics;
 using Robot.Test;
 using System.Threading.Tasks;
 using SharedLib;
+using Proto;
 
 namespace Robot
 {

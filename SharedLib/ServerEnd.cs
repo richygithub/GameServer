@@ -1,4 +1,5 @@
-﻿using SharedLib;
+﻿using Proto;
+using SharedLib;
 using System;
 using System.Collections.Generic;
 using System.Net;
@@ -9,7 +10,7 @@ namespace UseLibuv
     public class ServerEnd
     {
         Dictionary<int, Channel> _clients = new Dictionary<int, Channel>();
-        EventLoop _loop;
+        EventLoop _netLoop;
 
         //Dictionary<int,
 
@@ -18,9 +19,9 @@ namespace UseLibuv
         IPEndPoint _ip;
         public ServerEnd(EventLoop loop, IDispatcher dispatcher, int port)
         {
-            _loop = loop;
+            _netLoop = loop;
             //IPEndPoint ep = new IPEndPoint(IPAddress.Any, _port);
-            _tcpHandle = new TcpListen(_loop);
+            _tcpHandle = new TcpListen(_netLoop);
 
             _tcpHandle.ChannelAddEvent += AddChannel;
 
@@ -55,7 +56,7 @@ namespace UseLibuv
                 _packetRead.process(buff, 0, nread, packets);
                 Console.WriteLine($"Recv:{nread} at channel:{c.Id}");
 
-                _dispatcher.Process(_loop, c, packets);
+                _dispatcher.Process(_netLoop, c, packets);
 
             }
 

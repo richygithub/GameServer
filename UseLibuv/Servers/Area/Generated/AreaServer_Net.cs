@@ -20,19 +20,7 @@ namespace Area.PlayerHandler
 
 namespace UseLibuv{
 
-    public class Client: ClientEnd
-    {
-        public Client(EventLoop loop) : base(loop)
-        {
-
-        }
-        public void SendPacket()
-        {
-
-        }
-
-    }
-
+    /*
     static public class Area
     {
         static public class PlayerHandler
@@ -82,6 +70,7 @@ namespace UseLibuv{
         }
         
     }
+    */
 
     public class Proxy
     {
@@ -96,12 +85,6 @@ namespace UseLibuv{
         {
 
         }
-        /*
-        void @"a.b.c"()
-        {
-        }
-        */
-
     }
 
 
@@ -134,7 +117,7 @@ namespace UseLibuv{
 
             Channel c = new Channel();
 
-            int i = await Area.PlayerHandler.GetUserNum(c,"abcd3");
+            //int i = await Area.PlayerHandler.GetUserNum(c,"abcd3");
 
         }
 
